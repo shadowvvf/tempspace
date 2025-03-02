@@ -5,7 +5,34 @@ import platform
 import subprocess
 import shutil
 
+# ANSI escape codes for colors
+RESET = "\033[0m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+
 def main():
+    while True:
+        print(f"{GREEN}Меню:{RESET}")
+        print(f"1. Создать новую временную директорию")
+        print(f"2. Список временных директорий")
+        print(f"3. Досрочное удаление временной директории")
+        print(f"4. Выход")
+        choice = input(f"{YELLOW}Выберите опцию: {RESET}")
+
+        if choice == '1':
+            create_temp_directory()
+        elif choice == '2':
+            list_temp_directories()
+        elif choice == '3':
+            delete_temp_directory()
+        elif choice == '4':
+            print(f"{GREEN}Выход...{RESET}")
+            break
+        else:
+            print(f"{RED}Неверный выбор, попробуйте снова.{RESET}")
+
+def create_temp_directory():
     home_dir = os.path.expanduser("~")
     scripttemp_dir = os.path.join(home_dir, ".ScriptTemp")
     projects_dir = os.path.join(home_dir, "ScriptTemp_projects")
@@ -15,69 +42,67 @@ def main():
     if not os.path.exists(projects_dir):
         os.makedirs(projects_dir)
 
-    print("Проверка директорий на удаление...")
+    print(f"{YELLOW}Создание новой временной директории...{RESET}")
+    new_dir_name = str(uuid.uuid4())
+    new_dir_path = os.path.join(projects_dir, new_dir_name)
+    os.makedirs(new_dir_path)
+    print(f"{GREEN}Временная директория создана: {new_dir_path}{RESET}")
+
+    deletion_days = input(f"{YELLOW}Введите количество дней до удаления (или 0 для немедленного удаления): {RESET}")
+    try:
+        deletion_days = int(deletion_days)
+        if deletion_days < 0:
+            print(f"{RED}Ошибка: количество дней не может быть отрицательным.{RESET}")
+            return
+    except ValueError:
+        print(f"{RED}Ошибка: введите корректное число.{RESET}")
+        return
+
+    meta_file = os.path.join(scripttemp_dir, new_dir_name + ".meta")
+    with open(meta_file, "w") as f:
+        f.write(new_dir_path + "\n")
+        f.write(str(time.time() + deletion_days * 86400) + "\n")
+
+    print(f"{GREEN}Временная директория будет удалена {'при следующем запуске' if deletion_days == 0 else f'через {deletion_days} дней'}.{RESET}")
+
+def list_temp_directories():
+    home_dir = os.path.expanduser("~")
+    scripttemp_dir = os.path.join(home_dir, ".ScriptTemp")
+    print(f"{YELLOW}Список временных директорий:{RESET}")
     for meta_file in os.listdir(scripttemp_dir):
         if meta_file.endswith(".meta"):
             meta_path = os.path.join(scripttemp_dir, meta_file)
-            project_path = ""
-            deletion_time = 0
-            
-            try:
-                with open(meta_path, "r") as f:
-                    lines = f.readlines()
-                    if len(lines) >= 2:
-                        project_path = lines[0].strip()
-                        deletion_time = float(lines[1].strip())
-                
-                current_time = time.time()
-                if deletion_time == -1 or (deletion_time > 0 and current_time > deletion_time):
-                    if os.path.exists(project_path) and project_path.startswith(projects_dir):
-                        print(f"Удаление устаревшей директории: {project_path}")
-                        shutil.rmtree(project_path)
-                    time.sleep(0.1)
-                    try:
-                        os.remove(meta_path)
-                    except PermissionError:
-                        print(f"Не удалось удалить мета-файл: {meta_path}")
-            except Exception as e:
-                print(f"Ошибка при обработке мета-файла {meta_file}: {e}")
-                continue
+            with open(meta_path, "r") as f:
+                lines = f.readlines()
+                if len(lines) >= 2:
+                    project_path = lines[0].strip()
+                    deletion_time = float(lines[1].strip())
+                    print(f"{GREEN}Директория: {project_path}, Удаление через: {deletion_time}{RESET}")
 
-    print("Создание новой временной директории проекта...")
-    project_uuid = str(uuid.uuid4())
-    project_path = os.path.join(projects_dir, project_uuid)
-    os.makedirs(project_path)
+def delete_temp_directory():
+    home_dir = os.path.expanduser("~")
+    scripttemp_dir = os.path.join(home_dir, ".ScriptTemp")
+    projects_dir = os.path.join(home_dir, "ScriptTemp_projects")
 
-    print(f"Открытие директории: {project_path}")
-    try:
-        if platform.system() == "Windows":
-            os.startfile(project_path)
-        elif platform.system() == "Darwin":
-            subprocess.call(['open', project_path])
-        else:  # Linux
-            subprocess.call(['xdg-open', project_path])
-    except Exception as e:
-        print(f"Не удалось открыть директорию: {e}")
+    print(f"{YELLOW}Список временных директорий для удаления:{RESET}")
+    for meta_file in os.listdir(scripttemp_dir):
+        if meta_file.endswith(".meta"):
+            meta_path = os.path.join(scripttemp_dir, meta_file)
+            with open(meta_path, "r") as f:
+                lines = f.readlines()
+                if len(lines) >= 2:
+                    project_path = lines[0].strip()
+                    print(f"{GREEN}{project_path}{RESET}")
 
-    print("Введите количество дней, через которое удалить эту директорию (0 — при следующем запуске): ")
-    days_input = input()
-    try:
-        days = float(days_input)
-    except ValueError:
-        days = 0
+    dir_to_delete = input(f"{YELLOW}Введите имя директории для удаления: {RESET}")
+    dir_to_delete_path = os.path.join(projects_dir, dir_to_delete)
 
-    if days == 0:
-        deletion_time = -1
+    if os.path.exists(dir_to_delete_path):
+        shutil.rmtree(dir_to_delete_path)
+        os.remove(meta_path)
+        print(f"{GREEN}Директория {dir_to_delete} успешно удалена.{RESET}")
     else:
-        deletion_time = time.time() + days * 86400
+        print(f"{RED}Директория {dir_to_delete} не найдена.{RESET}")
 
-    meta_file = os.path.join(scripttemp_dir, project_uuid + ".meta")
-    with open(meta_file, "w") as f:
-        f.write(project_path + "\n")
-        f.write(str(deletion_time) + "\n")
-
-    print(f"Временная директория проекта создана по адресу: {project_path}")
-    print(f"Она будет удалена {'при следующем запуске' if days == 0 else f'через {days} дней'}.")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

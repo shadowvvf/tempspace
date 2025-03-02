@@ -10,6 +10,10 @@ A Python script that helps manage temporary project directories by creating them
 - Automatic cleanup of expired directories
 - Cross-platform support (Windows, macOS, Linux)
 
+## New Feature
+
+- **List Temporary Directories**: You can now view all existing temporary project directories along with their deletion statuses by running the script. This feature helps you keep track of your temporary projects and their scheduled deletion times.
+
 ## Requirements
 
 - Python 3.x
@@ -40,6 +44,7 @@ The script will:
 3. Prompt you to specify when the directory should be deleted:
    - Enter number of days (e.g., `7` for one week)
    - Enter `0` to delete the directory on next script execution
+4. List all existing temporary project directories and their deletion statuses.
 
 ## Directory Structure
 
