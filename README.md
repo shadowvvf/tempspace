@@ -71,4 +71,16 @@ The script creates and manages two main directories:
 The script only deletes directories that:
 1. Exist within the `ScriptTemp_projects` directory
 2. Have a corresponding `.meta` file
-3. Have reached their deletion time 
+3. Have reached their deletion time
+
+# GUI Application
+
+## Running the GUI
+
+To run the GUI application, execute the following command:
+
+```bash
+python gui.py
+```
+
+This will launch the GUI interface built with PySide6. 
