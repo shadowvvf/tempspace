@@ -76,9 +76,14 @@ class MainWindow(QMainWindow):
         if ok:
             dir_to_delete_path = os.path.join(projects_dir, dir_to_delete)
             if os.path.exists(dir_to_delete_path):
-                shutil.rmtree(dir_to_delete_path)
-                os.remove(os.path.join(scripttemp_dir, dir_to_delete + '.meta'))
-                self.text_area.append(f'Директория {dir_to_delete} успешно удалена.')
+                # Confirmation dialog
+                confirm = QMessageBox.question(self, 'Подтверждение удаления', f'Вы уверены, что хотите удалить директорию {dir_to_delete}?', QMessageBox.Yes | QMessageBox.No)
+                if confirm == QMessageBox.Yes:
+                    shutil.rmtree(dir_to_delete_path)
+                    os.remove(os.path.join(scripttemp_dir, dir_to_delete + '.meta'))
+                    self.text_area.append(f'Директория {dir_to_delete} успешно удалена.')
+                else:
+                    self.text_area.append('Удаление отменено.')
             else:
                 QMessageBox.warning(self, 'Ошибка', f'Директория {dir_to_delete} не найдена.')
 
