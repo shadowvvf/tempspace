@@ -48,18 +48,25 @@ def create_temp_directory():
         print(f'Ошибка при создании временной директории: {e}')
 
 def list_temp_directories():
-    home_dir = os.path.expanduser("~")
-    scripttemp_dir = os.path.join(home_dir, ".ScriptTemp")
-    print(f"{YELLOW}Список временных директорий:{RESET}")
-    for meta_file in os.listdir(scripttemp_dir):
-        if meta_file.endswith(".meta"):
-            meta_path = os.path.join(scripttemp_dir, meta_file)
-            with open(meta_path, "r") as f:
-                lines = f.readlines()
-                if len(lines) >= 2:
-                    project_path = lines[0].strip()
-                    deletion_time = float(lines[1].strip())
-                    print(f"{GREEN}Директория: {project_path}, Удаление через: {deletion_time}{RESET}")
+    home_dir = os.path.expanduser('~')
+    projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
+
+    try:
+        directories = os.listdir(projects_dir)
+        if not directories:
+            print('Нет временных директорий.')
+            return
+        print('Список временных директорий:')
+        for directory in directories:
+            meta_file = os.path.join(home_dir, '.ScriptTemp', directory + '.meta')
+            if os.path.exists(meta_file):
+                with open(meta_file, 'r') as f:
+                    deletion_time = f.readline().strip()
+                    print(f' - {directory}: Удаление запланировано на {time.ctime(float(deletion_time))}')
+            else:
+                print(f' - {directory}: Нет информации о времени удаления.')
+    except Exception as e:
+        print(f'Ошибка при получении списка временных директорий: {e}')
 
 def delete_temp_directory():
     home_dir = os.path.expanduser("~")
