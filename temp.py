@@ -33,37 +33,19 @@ def main():
             print(f"{RED}Неверный выбор, попробуйте снова.{RESET}")
 
 def create_temp_directory():
-    home_dir = os.path.expanduser("~")
-    scripttemp_dir = os.path.join(home_dir, ".ScriptTemp")
-    projects_dir = os.path.join(home_dir, "ScriptTemp_projects")
+    home_dir = os.path.expanduser('~')
+    projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
 
-    if not os.path.exists(scripttemp_dir):
-        os.makedirs(scripttemp_dir)
-    if not os.path.exists(projects_dir):
-        os.makedirs(projects_dir)
-
-    print(f"{YELLOW}Создание новой временной директории...{RESET}")
-    new_dir_name = str(uuid.uuid4())
-    new_dir_path = os.path.join(projects_dir, new_dir_name)
-    os.makedirs(new_dir_path)
-    print(f"{GREEN}Временная директория создана: {new_dir_path}{RESET}")
-
-    deletion_days = input(f"{YELLOW}Введите количество дней до удаления (или 0 для немедленного удаления): {RESET}")
     try:
-        deletion_days = int(deletion_days)
-        if deletion_days < 0:
-            print(f"{RED}Ошибка: количество дней не может быть отрицательным.{RESET}")
-            return
-    except ValueError:
-        print(f"{RED}Ошибка: введите корректное число.{RESET}")
-        return
-
-    meta_file = os.path.join(scripttemp_dir, new_dir_name + ".meta")
-    with open(meta_file, "w") as f:
-        f.write(new_dir_path + "\n")
-        f.write(str(time.time() + deletion_days * 86400) + "\n")
-
-    print(f"{GREEN}Временная директория будет удалена {'при следующем запуске' if deletion_days == 0 else f'через {deletion_days} дней'}.{RESET}")
+        os.makedirs(projects_dir, exist_ok=True)
+        temp_dir_name = str(uuid.uuid4())
+        temp_dir_path = os.path.join(projects_dir, temp_dir_name)
+        os.makedirs(temp_dir_path)
+        # Open the directory in the file explorer
+        subprocess.Popen(['explorer', temp_dir_path])
+        return temp_dir_path
+    except Exception as e:
+        print(f'Ошибка при создании временной директории: {e}')
 
 def list_temp_directories():
     home_dir = os.path.expanduser("~")
