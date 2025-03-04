@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QVBoxLayout, QWidget, QTextEdit, QMessageBox, QInputDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QVBoxLayout, QWidget, QTextEdit, QMessageBox, QInputDialog, QStatusBar
 import os
 import time
 import uuid
@@ -8,7 +8,7 @@ import shutil
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('My GUI Application')
+        self.setWindowTitle('ScriptTemp Manager')
         self.setGeometry(100, 100, 600, 400)
 
         self.layout = QVBoxLayout()
@@ -31,6 +31,10 @@ class MainWindow(QMainWindow):
         container.setLayout(self.layout)
         self.setCentralWidget(container)
 
+        # Create a status bar
+        self.status_bar = QStatusBar(self)
+        self.setStatusBar(self.status_bar)
+
     def create_temp_directory(self):
         home_dir = os.path.expanduser('~')
         scripttemp_dir = os.path.join(home_dir, '.ScriptTemp')
@@ -52,6 +56,7 @@ class MainWindow(QMainWindow):
                 f.write(new_dir_path + '\n')
                 f.write(str(time.time() + deletion_days * 86400) + '\n')
             self.text_area.append(f'Временная директория создана: {new_dir_path}')
+            self.status_bar.showMessage('Временная директория создана: ' + new_dir_path)
 
     def list_temp_directories(self):
         home_dir = os.path.expanduser('~')
@@ -82,6 +87,7 @@ class MainWindow(QMainWindow):
                     shutil.rmtree(dir_to_delete_path)
                     os.remove(os.path.join(scripttemp_dir, dir_to_delete + '.meta'))
                     self.text_area.append(f'Директория {dir_to_delete} успешно удалена.')
+                    self.status_bar.showMessage('Директория удалена успешно.')
                 else:
                     self.text_area.append('Удаление отменено.')
             else:
