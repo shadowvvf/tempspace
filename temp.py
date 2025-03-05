@@ -38,8 +38,12 @@ def create_temp_directory():
 
     try:
         os.makedirs(projects_dir, exist_ok=True)
-        temp_dir_name = str(uuid.uuid4())
-        temp_dir_path = os.path.join(projects_dir, temp_dir_name)
+        custom_name, ok = QInputDialog.getText(self, 'Custom Name', 'Введите имя для временной директории:')
+        if ok and custom_name:
+            new_dir_name = custom_name
+        else:
+            new_dir_name = str(uuid.uuid4())
+        temp_dir_path = os.path.join(projects_dir, new_dir_name)
         os.makedirs(temp_dir_path)
         # Open the directory in the file explorer
         subprocess.Popen(['explorer', temp_dir_path])
@@ -99,6 +103,20 @@ def delete_temp_directory():
             print(f'{RED}Ошибка при удалении директории: {e}{RESET}')
     else:
         print(f"{RED}Директория {dir_to_delete} не найдена.{RESET}")
+
+def cleanup_expired_directories():
+    home_dir = os.path.expanduser('~')
+    projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
+    current_time = time.time()
+    for directory in os.listdir(projects_dir):
+        meta_file = os.path.join(home_dir, '.ScriptTemp', directory + '.meta')
+        if os.path.exists(meta_file):
+            with open(meta_file, 'r') as f:
+                deletion_time = float(f.readline().strip())
+                if current_time >= deletion_time:
+                    shutil.rmtree(os.path.join(projects_dir, directory))
+                    os.remove(meta_file)
+                    print(f'{RED}Директория {directory} была удалена из-за истечения срока действия.{RESET}')
 
 if __name__ == '__main__':
     main()
