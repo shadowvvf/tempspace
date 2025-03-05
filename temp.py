@@ -43,6 +43,7 @@ def create_temp_directory():
         os.makedirs(temp_dir_path)
         # Open the directory in the file explorer
         subprocess.Popen(['explorer', temp_dir_path])
+        print(f'Временная директория создана: {temp_dir_path}')
         return temp_dir_path
     except Exception as e:
         print(f'Ошибка при создании временной директории: {e}')
