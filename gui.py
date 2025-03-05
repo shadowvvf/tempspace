@@ -75,25 +75,22 @@ class MainWindow(QMainWindow):
                         self.text_area.append(f'Директория: {project_path}, Удаление через: {deletion_time}')
 
     def delete_temp_directory(self):
-        home_dir = os.path.expanduser('~')
-        scripttemp_dir = os.path.join(home_dir, '.ScriptTemp')
-        projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
+        reply = QMessageBox.question(self, 'Подтверждение', 'Вы уверены, что хотите удалить эту временную директорию?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            home_dir = os.path.expanduser('~')
+            scripttemp_dir = os.path.join(home_dir, '.ScriptTemp')
+            projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
 
-        dir_to_delete, ok = QInputDialog.getText(self, 'Input', 'Введите имя директории для удаления:')
-        if ok:
-            dir_to_delete_path = os.path.join(projects_dir, dir_to_delete)
-            if os.path.exists(dir_to_delete_path):
-                # Confirmation dialog
-                confirm = QMessageBox.question(self, 'Подтверждение удаления', f'Вы уверены, что хотите удалить директорию {dir_to_delete}?', QMessageBox.Yes | QMessageBox.No)
-                if confirm == QMessageBox.Yes:
+            dir_to_delete, ok = QInputDialog.getText(self, 'Input', 'Введите имя директории для удаления:')
+            if ok:
+                dir_to_delete_path = os.path.join(projects_dir, dir_to_delete)
+                if os.path.exists(dir_to_delete_path):
                     shutil.rmtree(dir_to_delete_path)
                     os.remove(os.path.join(scripttemp_dir, dir_to_delete + '.meta'))
                     self.text_area.append(f'Директория {dir_to_delete} успешно удалена.')
                     self.status_bar.showMessage('Директория удалена успешно.')
                 else:
-                    self.text_area.append('Удаление отменено.')
-            else:
-                QMessageBox.warning(self, 'Ошибка', f'Директория {dir_to_delete} не найдена.')
+                    QMessageBox.warning(self, 'Ошибка', f'Директория {dir_to_delete} не найдена.')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
