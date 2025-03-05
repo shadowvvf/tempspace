@@ -63,7 +63,8 @@ def list_temp_directories():
             if os.path.exists(meta_file):
                 with open(meta_file, 'r') as f:
                     deletion_time = f.readline().strip()
-                    print(f' - {directory}: Удаление запланировано на {time.ctime(float(deletion_time))}')
+                    creation_time = os.path.getctime(os.path.join(projects_dir, directory))
+                    print(f' - {directory}: Создано {time.ctime(creation_time)}, Удаление запланировано на {time.ctime(float(deletion_time))}')
             else:
                 print(f' - {directory}: Нет информации о времени удаления.')
     except Exception as e:
@@ -88,9 +89,14 @@ def delete_temp_directory():
     dir_to_delete_path = os.path.join(projects_dir, dir_to_delete)
 
     if os.path.exists(dir_to_delete_path):
-        shutil.rmtree(dir_to_delete_path)
-        os.remove(meta_path)
-        print(f"{GREEN}Директория {dir_to_delete} успешно удалена.{RESET}")
+        try:
+            shutil.rmtree(dir_to_delete_path)
+            os.remove(meta_path)
+            print(f'{GREEN}Директория {dir_to_delete} успешно удалена.{RESET}')
+        except FileNotFoundError:
+            print(f'{RED}Ошибка: Директория {dir_to_delete} не найдена для удаления.{RESET}')
+        except Exception as e:
+            print(f'{RED}Ошибка при удалении директории: {e}{RESET}')
     else:
         print(f"{RED}Директория {dir_to_delete} не найдена.{RESET}")
 
