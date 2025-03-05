@@ -13,6 +13,7 @@ A Python script that helps manage temporary project directories by creating them
 ## New Feature
 
 - **List Temporary Directories**: You can now view all existing temporary project directories along with their deletion statuses by running the script. This feature helps you keep track of your temporary projects and their scheduled deletion times.
+- **Custom Name for Temporary Directories**: Users can now specify a custom name for the temporary directory when creating it, providing more flexibility in naming.
 
 ## Recent Changes
 

@@ -71,6 +71,7 @@ def list_temp_directories():
                     print(f' - {directory}: Создано {time.ctime(creation_time)}, Удаление запланировано на {time.ctime(float(deletion_time))}')
             else:
                 print(f' - {directory}: Нет информации о времени удаления.')
+        print(f'Всего временных директорий: {len(directories)}')
     except Exception as e:
         print(f'Ошибка при получении списка временных директорий: {e}')
 
