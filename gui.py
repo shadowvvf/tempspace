@@ -45,7 +45,11 @@ class MainWindow(QMainWindow):
         if not os.path.exists(projects_dir):
             os.makedirs(projects_dir)
 
-        new_dir_name = str(uuid.uuid4())
+        custom_name, ok = QInputDialog.getText(self, 'Custom Name', 'Введите имя для временной директории:')
+        if ok and custom_name:
+            new_dir_name = custom_name
+        else:
+            new_dir_name = str(uuid.uuid4())
         new_dir_path = os.path.join(projects_dir, new_dir_name)
         os.makedirs(new_dir_path)
 
