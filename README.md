@@ -90,4 +90,8 @@ To run the GUI application, execute the following command:
 python gui.py
 ```
 
-This will launch the GUI interface built with PySide6. 
+This will launch the GUI interface built with PySide6.
+
+## Automatic Cleanup of Expired Directories
+
+The script now automatically removes any expired temporary directories upon startup, ensuring that your workspace remains clean and organized. 
