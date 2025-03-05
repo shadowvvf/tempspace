@@ -56,7 +56,9 @@ class MainWindow(QMainWindow):
                 f.write(new_dir_path + '\n')
                 f.write(str(time.time() + deletion_days * 86400) + '\n')
             self.text_area.append(f'Временная директория создана: {new_dir_path}')
-            self.status_bar.showMessage('Временная директория создана: ' + new_dir_path)
+            self.status_bar.showMessage('Создание временной директории...')
+            time.sleep(2)  # Simulating a delay
+            self.status_bar.showMessage('Временная директория создана.')
 
     def list_temp_directories(self):
         home_dir = os.path.expanduser('~')
