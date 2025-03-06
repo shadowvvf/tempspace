@@ -36,6 +36,10 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.status_bar)
 
     def create_temp_directory(self):
+        reply = QMessageBox.question(self, 'Подтверждение', 'Вы уверены, что хотите создать новую временную директорию?',
+                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.No:
+            return
         home_dir = os.path.expanduser('~')
         scripttemp_dir = os.path.join(home_dir, '.ScriptTemp')
         projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
