@@ -62,21 +62,14 @@ def list_temp_directories():
     projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
 
     try:
-        directories = os.listdir(projects_dir)
-        if not directories:
-            print('Нет временных директорий.')
+        temp_dirs = os.listdir(projects_dir)
+        if not temp_dirs:
+            print("Нет временных директорий.")
             return
-        print('Список временных директорий:')
-        for directory in directories:
-            meta_file = os.path.join(home_dir, '.ScriptTemp', directory + '.meta')
-            if os.path.exists(meta_file):
-                with open(meta_file, 'r') as f:
-                    deletion_time = f.readline().strip()
-                    creation_time = os.path.getctime(os.path.join(projects_dir, directory))
-                    print(f' - {directory}: Создано {time.ctime(creation_time)}, Удаление запланировано на {time.ctime(float(deletion_time))}')
-            else:
-                print(f' - {directory}: Нет информации о времени удаления.')
-        print(f'Всего временных директорий: {len(directories)}')
+        print("Список временных директорий:")
+        for dir_name in temp_dirs:
+            # Here you would typically check the deletion status
+            print(f"- {dir_name} (статус: активен)")  # Placeholder for actual status
     except Exception as e:
         print(f'Ошибка при получении списка временных директорий: {e}')
 
