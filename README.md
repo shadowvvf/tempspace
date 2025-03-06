@@ -17,10 +17,8 @@ A Python script that helps manage temporary project directories by creating them
 
 ## Recent Changes
 
-- **Confirmation Dialog**: Added a confirmation dialog before deleting temporary directories in the GUI to prevent accidental deletions.
-- **Error Handling**: Implemented error handling in the `create_temp_directory` function to manage potential issues during directory creation.
-- **Status Bar**: Introduced a status bar in the GUI for user feedback during operations such as creating and deleting directories.
-- **Improved Directory Listing**: Enhanced the `list_temp_directories` function to display the list of temporary directories in a clearer format, including scheduled deletion times.
+- **Confirmation Dialog**: Added a confirmation dialog before creating temporary directories to prevent accidental creations.
+- **Enhanced Directory Listing**: Improved the output format of the list of temporary directories for better readability.
 
 ## Requirements
 
