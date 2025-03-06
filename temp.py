@@ -50,7 +50,12 @@ def create_temp_directory():
         print(f'Временная директория создана: {temp_dir_path}')
         return temp_dir_path
     except Exception as e:
-        print(f'Ошибка при создании временной директории: {e}')
+        if isinstance(e, FileExistsError):
+            print(f'Ошибка: Директория уже существует: {e}')
+        elif isinstance(e, PermissionError):
+            print(f'Ошибка: У вас нет разрешения на создание директории: {e}')
+        else:
+            print(f'Ошибка при создании временной директории: {e}')
 
 def list_temp_directories():
     home_dir = os.path.expanduser('~')
