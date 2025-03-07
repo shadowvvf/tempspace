@@ -193,16 +193,96 @@ class MainWindow(QMainWindow):
     def list_temp_directories(self):
         home_dir = os.path.expanduser('~')
         scripttemp_dir = os.path.join(home_dir, '.ScriptTemp')
-        self.text_area.append('Список временных директорий:')
-        for meta_file in os.listdir(scripttemp_dir):
-            if meta_file.endswith('.meta'):
-                meta_path = os.path.join(scripttemp_dir, meta_file)
+        projects_dir = os.path.join(home_dir, 'ScriptTemp_projects')
+        
+        if not os.path.exists(scripttemp_dir) or not os.path.exists(projects_dir):
+            self.text_area.append('No temporary directories found.')
+            return
+            
+        self.text_area.clear()
+        current_time = time.time()
+        
+        # Header
+        self.text_area.append('📂 Temporary Directories List\n')
+        self.text_area.append('=' * 80 + '\n')
+        
+        # Find all meta files
+        meta_files = [f for f in os.listdir(scripttemp_dir) if f.endswith('.meta')]
+        
+        if not meta_files:
+            self.text_area.append('No temporary directories found.')
+            return
+            
+        for meta_file in sorted(meta_files):
+            meta_path = os.path.join(scripttemp_dir, meta_file)
+            try:
                 with open(meta_path, 'r') as f:
                     lines = f.readlines()
                     if len(lines) >= 2:
                         project_path = lines[0].strip()
                         deletion_time = float(lines[1].strip())
-                        self.text_area.append(f'Директория: {project_path}, Удаление через: {deletion_time}')
+                        
+                        # Get directory info
+                        dir_name = os.path.basename(project_path)
+                        exists = os.path.exists(project_path)
+                        time_left = deletion_time - current_time
+                        
+                        # Calculate size if directory exists
+                        size_str = 'N/A'
+                        if exists:
+                            try:
+                                total_size = sum(
+                                    os.path.getsize(os.path.join(dirpath, filename))
+                                    for dirpath, _, filenames in os.walk(project_path)
+                                    for filename in filenames
+                                )
+                                # Convert to appropriate unit
+                                for unit in ['B', 'KB', 'MB', 'GB']:
+                                    if total_size < 1024:
+                                        size_str = f"{total_size:.1f} {unit}"
+                                        break
+                                    total_size /= 1024
+                            except Exception:
+                                size_str = 'Error'
+                        
+                        # Format time remaining
+                        if time_left <= 0:
+                            time_str = '⚠️ Expired'
+                            status = '🔴 To be deleted'
+                        else:
+                            days = int(time_left // 86400)
+                            hours = int((time_left % 86400) // 3600)
+                            minutes = int((time_left % 3600) // 60)
+                            
+                            if days > 0:
+                                time_str = f"⏳ {days}d {hours}h remaining"
+                            elif hours > 0:
+                                time_str = f"⏳ {hours}h {minutes}m remaining"
+                            else:
+                                time_str = f"⏳ {minutes}m remaining"
+                            
+                            status = '🟢 Active' if exists else '🟡 Missing'
+                        
+                        # Format creation time
+                        try:
+                            creation_time = os.path.getctime(project_path)
+                            creation_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(creation_time))
+                        except:
+                            creation_str = 'Unknown'
+                        
+                        # Output formatted information
+                        self.text_area.append(f'Directory: {dir_name}')
+                        self.text_area.append(f'Status: {status}')
+                        self.text_area.append(f'Path: {project_path}')
+                        self.text_area.append(f'Size: {size_str}')
+                        self.text_area.append(f'Created: {creation_str}')
+                        self.text_area.append(f'Time Status: {time_str}')
+                        self.text_area.append('-' * 80 + '\n')
+                        
+            except Exception as e:
+                self.text_area.append(f'Error reading directory info: {str(e)}\n')
+                
+        self.status_bar.showMessage('Directory list updated successfully', 3000)
 
     def delete_temp_directory(self):
         reply = QMessageBox.question(self, 'Подтверждение', 'Вы уверены, что хотите удалить эту временную директорию?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
